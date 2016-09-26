@@ -25,6 +25,7 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.MyHolder> {
 
     public MyAdapter(Context context) {
         this.mContext = context;
+        mClickSubject = PublishSubject.create();
         myItems = new ArrayList<>();
     }
 

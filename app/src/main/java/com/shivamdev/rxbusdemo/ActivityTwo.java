@@ -16,6 +16,6 @@ public class ActivityTwo extends AppCompatActivity {
 
     private void addFragment() {
         FragmentTwo fragmentTwo = FragmentTwo.newInstance();
-        getSupportFragmentManager().beginTransaction().add(fragmentTwo, TAG).commit();
+        getSupportFragmentManager().beginTransaction().add(R.id.ll_fragment, fragmentTwo, TAG).commit();
     }
 }
