@@ -7,6 +7,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.hwangjr.rxbus.RxBus;
+import com.hwangjr.rxbus.annotation.Produce;
+import com.hwangjr.rxbus.annotation.Tag;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +20,21 @@ public class MainActivity extends AppCompatActivity {
     public static final String EVENT_KEY = "event_key";
 
     private MyAdapter adapter;
+    private String stringProduced;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        RxBus.get().register(this);
         init();
+    }
+
+    @Override
+    protected void onDestroy() {
+        RxBus.get().unregister(this);
+        super.onDestroy();
     }
 
     private void init() {
@@ -49,9 +59,14 @@ public class MainActivity extends AppCompatActivity {
                 .subscribe(new Action1<String>() {
                     @Override
                     public void call(String s) {
-                        RxBus.get().post(EVENT_KEY, s);
+                        stringProduced = s;
                         startActivity(new Intent(MainActivity.this, ActivityTwo.class));
                     }
                 });
+    }
+
+    @Produce(tags = {@Tag(EVENT_KEY)})
+    public String produceString() {
+        return stringProduced;
     }
 }

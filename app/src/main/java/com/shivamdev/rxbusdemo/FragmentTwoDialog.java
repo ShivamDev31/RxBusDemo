@@ -12,12 +12,16 @@ import android.widget.TextView;
 import com.hwangjr.rxbus.RxBus;
 import com.hwangjr.rxbus.annotation.Subscribe;
 import com.hwangjr.rxbus.annotation.Tag;
+import com.hwangjr.rxbus.thread.EventThread;
 
 /**
  * Created by shivam on 26/9/16.
  */
 
 public class FragmentTwoDialog extends DialogFragment {
+
+    private View contentView;
+    private TextView textView;
 
     private String stringFromBus;
 
@@ -28,37 +32,31 @@ public class FragmentTwoDialog extends DialogFragment {
         return fragment;
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        RxBus.get().register(this);
-    }
-
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_two_dialog, container, false);
-    }
-
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        TextView tvText = (TextView) view.findViewById(R.id.tv_string_from_bus);
-        if (!TextUtils.isEmpty(stringFromBus)) {
-            tvText.setText(stringFromBus);
-        } else {
-            tvText.setText("No string received from bus");
+        if (contentView == null) {
+            contentView = inflater.inflate(R.layout.fragment_two_dialog, container, false);
+            textView = (TextView) contentView.findViewById(R.id.tv_string_from_bus);
+            RxBus.get().register(this);
         }
+        return contentView;
     }
 
-    @Subscribe(tags = {@Tag(MainActivity.EVENT_KEY)})
+    @Subscribe(tags = {@Tag(MainActivity.EVENT_KEY)},
+            thread = EventThread.MAIN_THREAD)
     public void stringFromBus(String s) {
         this.stringFromBus = s;
+        if (!TextUtils.isEmpty(stringFromBus)) {
+            textView.setText(stringFromBus);
+        } else {
+            textView.setText("No string received from bus");
+        }
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         RxBus.get().unregister(this);
+        super.onDestroy();
     }
 }
